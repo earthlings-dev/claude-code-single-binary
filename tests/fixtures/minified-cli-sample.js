@@ -1,0 +1,3 @@
+// Sample minified-ish content that matches key patterns our patchers search for
+export const SAMPLE = `#!/usr/bin/env node\n(function(){\nprocess.env.CLAUDE_CODE_ENTRYPOINT=\"cli\";\nconst x=new URL('./yoga.wasm', import.meta.url);\nlet y=Db.resolve(et9,\"vendor\",\"ripgrep\");\nif(typeof Bun!==\"undefined\"&&Bun.embeddedFiles?.length>0)B=\"./ripgrep.node\";else\nlet J=W.find((F)=>F&&cw0(F));if(!J){let F=\"No suitable shell found. Claude CLI requires a Posix shell environment. Please ensure you have a valid shell installed and the SHELL environment variable set.\";throw h1(new Error(F)),new Error(F)}\nvar z = path.resolve('./yoga.wasm');\n})();\n`;
+

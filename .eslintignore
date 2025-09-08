@@ -1,0 +1,10 @@
+dist/
+node_modules/
+vendor/
+.windows-build-temp/
+Claude_Code_*.md
+Claude_Code_*/
+*.min.js
+*.bundle.js
+*.generated.*
+

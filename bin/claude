@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: MIT OR Apache-2.0
+
+# Platform-aware shim to run the compiled single-binary when available,
+# falling back to the bundled JS CLI via Bun/Node.
+
+set -euo pipefail
+
+DIR="$(cd "$(dirname "$0")"/.. && pwd)"
+DIST="$DIR/dist"
+
+uname_s=$(uname -s 2>/dev/null || echo "")
+uname_m=$(uname -m 2>/dev/null || echo "")
+
+pick_binary() {
+  case "$uname_s" in
+    Linux)
+      case "$uname_m" in
+        x86_64)
+          # Prefer glibc standard variant
+          for name in \
+            "claude-code-linux-x64" \
+            "claude-code-linux-x64-modern" \
+            "claude-code-linux-x64-baseline" \
+            "claude-code-linux-x64-musl" \
+            "claude-code-linux-x64-musl-modern" \
+            "claude-code-linux-x64-musl-baseline"; do
+            [ -x "$DIST/$name" ] && echo "$DIST/$name" && return 0
+          done
+          ;;
+        aarch64|arm64)
+          for name in \
+            "claude-code-linux-arm64" \
+            "claude-code-linux-arm64-musl"; do
+            [ -x "$DIST/$name" ] && echo "$DIST/$name" && return 0
+          done
+          ;;
+      esac
+      ;;
+    Darwin)
+      case "$uname_m" in
+        x86_64)
+          for name in \
+            "claude-code-macos-x64" \
+            "claude-code-macos-x64-modern" \
+            "claude-code-macos-x64-baseline"; do
+            [ -x "$DIST/$name" ] && echo "$DIST/$name" && return 0
+          done
+          ;;
+        arm64)
+          [ -x "$DIST/claude-code-macos-arm64" ] && echo "$DIST/claude-code-macos-arm64" && return 0
+          ;;
+      esac
+      ;;
+    MINGW*|MSYS*|CYGWIN*|Windows_NT)
+      for name in \
+        "claude-code-windows-x64.exe" \
+        "claude-code-windows-x64-modern.exe" \
+        "claude-code-windows-x64-baseline.exe"; do
+        [ -x "$DIST/$name" ] && echo "$DIST/$name" && return 0
+      done
+      ;;
+  esac
+  return 1
+}
+
+if binpath=$(pick_binary); then
+  exec "$binpath" "$@"
+fi
+
+# Fallback: run the JS CLI via Bun if present, else Node
+CLI_JS="$DIR/cli.js"
+if command -v bun >/dev/null 2>&1; then
+  exec bun "$CLI_JS" "$@"
+elif command -v node >/dev/null 2>&1; then
+  exec node "$CLI_JS" "$@"
+else
+  echo "Error: no compiled binary found and neither bun nor node are installed." >&2
+  exit 1
+fi

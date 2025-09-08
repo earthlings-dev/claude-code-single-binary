@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: '1.2.21'
+
+      - name: Install (no-op if none)
+        run: |
+          bun --version
+          bun install || true
+
+      - name: Lint
+        run: bun run lint
+
+      - name: Generate tests
+        run: bun run test:generate
+
+      - name: Run tests with coverage
+        run: bun test --coverage
+
+      - name: Enforce coverage >= 90%
+        run: bun run scripts/test/check-coverage.mjs --threshold=90
+

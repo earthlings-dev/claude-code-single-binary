@@ -1,0 +1,34 @@
+{
+  "name": "claude-code",
+  "version": "1.0.108-single",
+  "main": "sdk.mjs",
+  "types": "sdk.d.ts",
+  "bin": {
+    "claude": "bin/claude"
+  },
+  "engines": {
+    "bun": ">=1.2.21"
+  },
+  "devDependencies": {
+    "eslint": "^9.8.0",
+    "prettier": "^3.3.3"
+  },
+  "optionalDependencies": {
+    "@anthropic-ai/claude-code": "latest"
+  },
+  "scripts": {
+    "update-sources": "bun run scripts/update/fetch-latest.mjs",
+    "prepare": "bun run scripts/build/prepare-current.js",
+    "compile": "bun run scripts/build/compile-current.js",
+    "tests": "bun test --coverage",
+    "test": "bun test --coverage",
+    "test:generate": "bun run scripts/testgen/generate-tests.mjs",
+    "format": "bun format",
+    "format:prettier": "prettier -w .",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "clean": "bun run scripts/build/clean.mjs --deep",
+    "clean:deep": "bun run scripts/build/clean.mjs --deep",
+    "postinstall": "bun run scripts/update/fetch-latest.mjs || true"
+  }
+}
